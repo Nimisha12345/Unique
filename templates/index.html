@@ -1,0 +1,112 @@
+<html>
+	<head>
+		<title>COVID-19 TESTING</title>
+        
+        <style>
+            
+/* CSS */
+input[type="file"] {
+    display: none;
+}
+.button-50,label {
+  appearance: button;
+  background-color: #000;
+  background-image: none;
+  border: 1px solid #000;
+  border-radius: 4px;
+  box-shadow: #fff 4px 4px 0 0,#000 4px 4px 0 1px;
+  box-sizing: border-box;
+  color: #fff;
+  cursor: pointer;
+  display: inline-block;
+  font-family: ITCAvantGardeStd-Bk,Arial,sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  margin: 0 5px 10px 0;
+  overflow: visible;
+  padding: 12px 40px;
+  text-align: center;
+  text-transform: none;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.button-50,label:focus {
+  text-decoration: none;
+}
+
+.button-50,label:hover {
+  text-decoration: none;
+}
+
+.button-50,label:active {
+  box-shadow: rgba(0, 0, 0, .125) 0 3px 5px inset;
+  outline: 0;
+}
+
+.button-50,label:not([disabled]):active {
+  box-shadow: #fff 2px 2px 0 0, #000 2px 2px 0 1px;
+  transform: translate(2px, 2px);
+}
+
+@media (min-width: 768px) {
+  .button-50,label{
+    padding: 12px 50px;
+  }
+}
+        </style>
+	</head>
+
+	<body style="background-color: #5F9EA0	;">
+        <center>
+        <br>
+		<h1>COVID-19 TESTING USING X-RAY IMAGES</h1>
+        <label> Enter Your File <input id="image-selector" type="file"></label>
+        <br>
+        
+		<button id="predict-button" class="button-50" role="button">Predict</button>
+		<p>Covid Probability Prediction: <span id="covid">...</span></p>
+		<p>Pneumonia Probability Prediction: <span id="pneumo">...</span></p>
+
+		<img id="selected-image" width="400" src=""/>
+        </center>
+	</body>
+
+    
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+
+<script>
+    let base64Image;
+    $("#image-selector").change(function() {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            let dataURL = reader.result;
+            $('#selected-image').attr("src", dataURL);
+            base64Image = dataURL.replace(/^data:image\/(png|jpg|jpeg);base64,/, "");
+            console.log(base64Image);
+        }
+        reader.readAsDataURL($("#image-selector")[0].files[0]);
+        $("#covid").text("");
+        $("#pneumo").text("");
+
+    });
+
+    $("#predict-button").click(function(){
+            let message = {
+            image: base64Image
+        }
+        console.log(message);
+        $.post("http://127.0.0.1:5000/predict", JSON.stringify(message), function(response){
+            $("#covid").text(response.prediction.covid);
+            $("#pneumo").text(response.prediction.pneumo.toFixed(2));
+            console.log(response);
+        });
+    });
+    
+</script>
+
+</html>
